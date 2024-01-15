@@ -257,16 +257,16 @@ class BigQueryHelper:
                 recordstamp_str = self.job_timestamp.strftime(
                     "%Y-%m-%dT%H:%M:%S.%fZ")
 
-                if self.last_job_timestamp:
+                #if self.last_job_timestamp:
                     # Query for deleting rows with Id that are present
                     # in the temporary table.
-                    delete_query = f"""
-                        DELETE FROM `{self.project_id}.{self.dataset_name}.{self.target_table_name}`
-                        WHERE {self.id_field_name} IN
-                        (SELECT {self.id_field_name} FROM `{self.project_id}.{self.dataset_name}.{self.temp_table_name}`
-                        );
-                    """
-                    query += delete_query
+                #    delete_query = f"""
+                #        DELETE FROM `{self.project_id}.{self.dataset_name}.{self.target_table_name}`
+                #        WHERE {self.id_field_name} IN
+                #        (SELECT {self.id_field_name} FROM `{self.project_id}.{self.dataset_name}.{self.temp_table_name}`
+                #        );
+                #    """
+                #    query += delete_query
 
                 # Query for copying data from the temp table
                 # to the destination table
