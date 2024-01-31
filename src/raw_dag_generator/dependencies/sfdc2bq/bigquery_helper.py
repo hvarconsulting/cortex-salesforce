@@ -244,11 +244,20 @@ class BigQueryHelper:
             for f in destination_schema.copy():
                 if f.name.lower() in ["isdeleted", "isarchived"]:
                     destination_schema.remove(f)
+            # Configure as opções de particionamento por tempo de ingestão
+            time_partitioning = bigquery.table.TimePartitioning(
+                type_=bigquery.TimePartitioningType.DAY,  # Pode ser DAY, HOUR, etc.
+                expiration_ms=None
+            )
 
+            table_definition = bigquery.Table(self.target_table_ref, destination_schema)
+            table_definition.time_partitioning = time_partitioning 
             table_obj = self.client.create_table(
-                bigquery.Table(self.target_table_ref, destination_schema),)
+                table_definition
+                )
+                
             self.target_table_ref = table_obj.reference
-
+            
         # If have data to copy/merge, construct and run merging query
         try:
             if not finish_empty_job:
