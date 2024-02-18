@@ -185,15 +185,22 @@ class BigQueryHelper:
         )
 
         with open(csv_batch_file, "rb") as file:
-            job = self.client.load_table_from_file(
-                file,
-                self.temp_table_ref,
-                job_config=self.job_config,
-                project=self.temp_table_ref.project,
-            )
-            job.result()
-            logging.info("Done. %i rows were added.", job.output_rows)
-            return job.output_rows
+
+            content = file.read()
+        content_without_null = content.replace(b'\x00', b'')
+        # Criar um objeto BytesIO com o conteúdo corrigido
+        content_io = io.BytesIO(content_without_null)
+        
+
+        job = self.client.load_table_from_file(
+            content_io,
+            self.temp_table_ref,
+            job_config=self.job_config,
+            project=self.temp_table_ref.project,
+        )
+        job.result()
+        logging.info("Done. %i rows were added.", job.output_rows)
+        return job.output_rows
 
     def finish_ingestion(self, finish_empty_job: bool):
         """Finalizes BigQuery ingestion:
